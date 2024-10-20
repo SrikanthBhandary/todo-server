@@ -3,7 +3,7 @@ package mocks
 import (
 	"context"
 
-	"github.com/srikanthdoc/todo-server/entity"
+	"github.com/srikanthbhandary/todo-server/entity"
 	"github.com/stretchr/testify/mock"
 )
 

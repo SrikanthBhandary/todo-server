@@ -5,9 +5,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/srikanthdoc/todo-server/entity"
-	"github.com/srikanthdoc/todo-server/mocks"
-	"github.com/srikanthdoc/todo-server/service"
+	"github.com/srikanthbhandary/todo-server/entity"
+	"github.com/srikanthbhandary/todo-server/mocks"
+	"github.com/srikanthbhandary/todo-server/service"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )

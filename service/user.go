@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/srikanthdoc/todo-server/entity"
-	"github.com/srikanthdoc/todo-server/repository"
+	"github.com/srikanthbhandary/todo-server/entity"
+	"github.com/srikanthbhandary/todo-server/repository"
 	"golang.org/x/crypto/bcrypt"
 )
 

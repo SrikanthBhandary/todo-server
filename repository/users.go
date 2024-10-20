@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/srikanthdoc/todo-server/entity"
+	"github.com/srikanthbhandary/todo-server/entity"
 )
 
 // UserRepository defines the interface for user operations

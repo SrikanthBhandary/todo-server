@@ -10,10 +10,10 @@ import (
 	"time"
 
 	"github.com/go-redis/redis"
-	"github.com/srikanthdoc/todo-server/entity"
-	"github.com/srikanthdoc/todo-server/mocks"
+	"github.com/srikanthbhandary/todo-server/entity"
+	"github.com/srikanthbhandary/todo-server/mocks"
 
-	"github.com/srikanthdoc/todo-server/worker"
+	"github.com/srikanthbhandary/todo-server/worker"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )

@@ -7,7 +7,7 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
-	"github.com/srikanthdoc/todo-server/entity"
+	"github.com/srikanthbhandary/todo-server/entity"
 )
 
 func (s *Router) CreateUser(w http.ResponseWriter, r *http.Request) {

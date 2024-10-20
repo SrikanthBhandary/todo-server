@@ -8,8 +8,8 @@ import (
 	"strings"
 
 	"github.com/gorilla/mux"
-	"github.com/srikanthdoc/todo-server/service"
-	"github.com/srikanthdoc/todo-server/worker"
+	"github.com/srikanthbhandary/todo-server/service"
+	"github.com/srikanthbhandary/todo-server/worker"
 )
 
 type Router struct {

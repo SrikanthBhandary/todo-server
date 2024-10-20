@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/srikanthdoc/todo-server/entity"
+	"github.com/srikanthbhandary/todo-server/entity"
 )
 
 // ToDoRepository defines the interface for ToDo operations

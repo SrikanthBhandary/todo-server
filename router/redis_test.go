@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/go-redis/redis"
-	"github.com/srikanthdoc/todo-server/mocks"
+	"github.com/srikanthbhandary/todo-server/mocks"
 	"github.com/stretchr/testify/assert"
 )
 

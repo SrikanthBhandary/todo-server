@@ -12,11 +12,11 @@ import (
 
 	"github.com/go-redis/redis"
 	_ "github.com/lib/pq"
-	"github.com/srikanthdoc/todo-server/mocks"
-	"github.com/srikanthdoc/todo-server/repository"
-	"github.com/srikanthdoc/todo-server/router"
-	"github.com/srikanthdoc/todo-server/service"
-	"github.com/srikanthdoc/todo-server/worker"
+	"github.com/srikanthbhandary/todo-server/mocks"
+	"github.com/srikanthbhandary/todo-server/repository"
+	"github.com/srikanthbhandary/todo-server/router"
+	"github.com/srikanthbhandary/todo-server/service"
+	"github.com/srikanthbhandary/todo-server/worker"
 )
 
 const (
