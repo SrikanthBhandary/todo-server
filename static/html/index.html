@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ToDo App</title>
+    <style>
+     body {
+      font-family: Arial, sans-serif;
+      background-color: #f9fbe7; /* Soft pastel background */
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #009688; /* Teal header */
+      color: white;
+      text-align: center;
+      padding: 1em;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 20px auto;
+      background-color: #fff8e1; /* Sticky note effect */
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    input,
+    button {
+      padding: 10px;
+      margin: 5px 0;
+      width: calc(100% - 22px);
+      border: 1px solid #009688; /* Teal border */
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+
+    button {
+      background-color: #009688; /* Teal */
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #00796b; /* Darker teal on hover */
+    }
+
+    h1 {
+      color: #009688; /* Teal for headings */
+    }
+
+    .todo-list {
+      margin-top: 20px;
+      padding: 0;
+    }
+
+    .todo-list div {
+      padding: 10px;
+      background-color: #e3f2fd; /* Light blue for todo items */
+      border: 1px solid #90caf9; /* Light blue border */
+      margin-bottom: 5px;
+      border-radius: 4px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .icon {
+      vertical-align: middle;
+      margin-right: 5px;
+    }
+
+    #flash-message {
+      display: none;
+      color: #f44336;
+      text-align: center;
+      margin: 10px 0;
+    }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    
+      <header>
+        <div style="display: flex; align-items: center;">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 200 200"
+            width="50"
+            height="50"
+          >
+            <!-- Sticky Note Background -->
+            <rect
+              x="20"
+              y="20"
+              width="160"
+              height="160"
+              rx="20"
+              fill="#80cbc4"
+            />
+            <path
+              d="M60 100 L85 125 L140 70"
+              stroke="white"
+              stroke-width="10"
+              fill="none"
+            />
+            <text
+              x="50"
+              y="190"
+              font-family="Arial"
+              font-size="20"
+              fill="black"
+            >
+              ToDo App
+            </text>
+          </svg>
+          <h1 style="color: white; margin-left: 10px;">ToDos Application</h1>
+        </div >
+    </header>
+    
+
+    <!-- Main Container -->
+    <div class="container">
+      <!-- Authentication Container -->
+      <div id="auth-container">
+        <h1>Sign In / Sign Up</h1>
+
+        <!-- Sign Up Form -->
+        <div id="signup-form">
+          <h2>Create Account</h2>
+          <input type="text" id="username" placeholder="Username" />
+          <input type="password" id="password" placeholder="Password" />
+          <input type="email" id="email" placeholder="Email" />
+          <button onclick="createUser()">Create User</button>
+        </div>
+
+        <!-- Login Form -->
+        <div id="login-form">
+          <h2>Login</h2>
+          <input type="text" id="login-username" placeholder="Username" />
+          <input type="password" id="login-password" placeholder="Password" />
+          <button onclick="loginUser()">Login</button>
+        </div>
+      </div>
+
+      <!-- Home Container -->
+      <div id="home-container" class="hidden">
+        <h1>ToDo Application</h1>
+
+        <!-- Create Todo Section -->
+        <h2>Create Todo</h2>
+        <input type="text" id="todo-title" placeholder="Title" />
+        <input type="text" id="todo-description" placeholder="Description" />
+        <button onclick="createTodo()">Create Todo</button>
+
+        <!-- Todo List Section -->
+        <h2>Your Todos</h2>
+        <div class="todo-list" id="todo-list"></div>
+
+        <!-- Logout Button -->
+        <button onclick="logout()">Logout</button>
+      </div>
+    </div>
+
+    <script>
+      // Function to create a user
+      async function createUser() {
+        const username = document.getElementById("username").value;
+        const password = document.getElementById("password").value;
+        const email = document.getElementById("email").value;
+
+        // Simple validation check
+        if (!username || !password || !email) {
+          alert("All fields are required.");
+          return;
+        }
+
+        const response = await fetch("/users", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            user_name: username,
+            password: password,
+            email: email,
+          }),
+        });
+
+        if (response.ok) {
+          alert("User created successfully!");
+        } else {
+          alert("Error creating user.");
+        }
+      }
+
+      // Function to show the home container and hide the auth container
+      function showHomeContainer() {
+        document.getElementById("auth-container").classList.add("hidden");
+        document.getElementById("home-container").classList.remove("hidden");
+      }
+
+      // Function to show the auth container and hide the home container (for logout)
+      function showAuthContainer() {
+        document.getElementById("auth-container").classList.remove("hidden");
+        document.getElementById("home-container").classList.add("hidden");
+      }
+
+      // Function to login the user and store the token in cookies
+      async function loginUser() {
+        const username = document.getElementById("login-username").value;
+        const password = document.getElementById("login-password").value;
+
+        const response = await fetch("/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ username: username, password: password }),
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+          const token = data.token; // Get the JWT token from the response
+          const expiresIn = data.expiresIn; // Get expiration time from the response
+
+          // Store the token in a cookie with expiry
+          document.cookie = `authToken=${token}; max-age=${expiresIn}; path=/`;
+
+          alert("Login successful!");
+          showHomeContainer(); // Show home container after login
+          getTodos(); // Fetch todos after login
+        } else {
+          alert("Error logging in.");
+        }
+      }
+
+      // Function to get the stored token from cookies
+      function getToken() {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; authToken=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+        return null;
+      }
+
+      // Function to create a todo using the stored token
+      async function createTodo() {
+        const title = document.getElementById("todo-title").value;
+        const description = document.getElementById("todo-description").value;
+        const token = getToken(); // Get the token from cookies
+
+        if (!token) {
+          alert("You need to log in first.");
+          return;
+        }
+
+        const response = await fetch("/todos", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // Use the token in the request
+          },
+          body: JSON.stringify({ title: title, description: description }),
+        });
+
+        if (response.ok) {
+          alert("Todo created successfully!");
+          getTodos(); // Refresh the list of todos
+        } else {
+          alert("Error creating todo.");
+        }
+      }
+
+      // Function to fetch todos using the stored token
+      async function getTodos() {
+        const token = getToken(); // Get the token from cookies
+
+        if (!token) {
+          alert("You need to log in first.");
+          return;
+        }
+
+        const response = await fetch("/todos", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // Use the token in the request
+          },
+        });
+
+        const todos = await response.json();
+        const todoList = document.getElementById("todo-list");
+        todoList.innerHTML = ""; // Clear the existing list
+
+        if (response.ok) {
+          todos.forEach((todo) => {
+            const todoItem = document.createElement("div");
+            todoItem.classList.add("todo-card"); // Apply the card style
+            todoItem.innerHTML = `
+              <h3>${todo.title}</h3>
+              <p>${todo.description}</p>
+              <button onclick="deleteTodo(${todo.id})">Delete</button>
+            `;
+            todoList.appendChild(todoItem);
+          });
+        } else {
+          alert("Error fetching todos.");
+        }
+      }
+
+      // Function to delete a todo using the stored token
+      async function deleteTodo(id) {
+        const token = getToken(); // Get the token from cookies
+
+        if (!token) {
+          alert("You need to log in first.");
+          return;
+        }
+
+        const response = await fetch(`/todos/${id}`, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`, // Use the token in the request
+          },
+        });
+
+        if (response.ok) {
+          alert("Todo deleted successfully!");
+          getTodos(); // Refresh the list of todos
+        } else {
+          alert("Error deleting todo.");
+        }
+      }
+
+      // Function to decode the JWT and get the payload
+      function parseJwt(token) {
+        const base64Url = token.split('.')[1]; // Get the payload part
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(
+          atob(base64)
+            .split('')
+            .map(function (c) {
+              return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            })
+            .join('')
+        );
+        return JSON.parse(jsonPayload);
+      }
+
+      // Function to check if the token is expired
+      function isTokenExpired(token) {
+        const jwtPayload = parseJwt(token);
+        const currentTime = Date.now() / 1000; // Current time in seconds (JWT exp is in seconds)
+        return jwtPayload.exp < currentTime; // Return true if expired
+      }
+
+      // Function to check if the token is present and not expired
+      function checkAuthStatus() {
+        const token = getToken();
+        if (token && !isTokenExpired(token)) {
+          showHomeContainer(); // Show home page if token is valid
+          getTodos(); // Fetch todos if token is valid
+        } else {
+          if (token && isTokenExpired(token)) {
+            alert("Session expired. Please log in again.");
+            logout(); // Remove the expired token and show login form
+          }
+          showAuthContainer(); // Show authentication form if no token or token expired
+        }
+      }
+
+      // Call checkAuthStatus when the page loads
+      window.onload = function() {
+        checkAuthStatus();
+      };
+
+      // Logout function to clear the token from cookies
+      function logout() {
+        document.cookie = "authToken=; max-age=0; path=/"; // Clear the token from cookies
+        showAuthContainer(); // Show the authentication form again
+      }
+    </script>
+  </body>
+</html>
