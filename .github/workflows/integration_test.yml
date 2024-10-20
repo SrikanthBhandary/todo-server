@@ -12,27 +12,6 @@ jobs:
   integration-test:
     runs-on: ubuntu-latest
 
-    services:
-      postgres:
-        image: postgres:15
-        ports:
-          - 5432:5432
-        env:
-          POSTGRES_USER: srikanth
-          POSTGRES_PASSWORD: password
-          POSTGRES_DB: postgres
-        options: >-
-          --health-cmd "pg_isready -U srikanth" 
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
-      redis:
-        image: redis:7
-        ports:
-          - 6379:6379
-        options: --health-cmd "redis-cli ping" --health-interval 10s --health-retries 5
-
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
@@ -47,16 +26,22 @@ jobs:
           go mod tidy
           go mod download
 
+      - name: Install Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose
+
       - name: Set up Docker Compose
         run: |
-          docker-compose up -d  # Start the app along with postgres and redis containers
+          docker-compose -f ./docker-compose.yml up -d  # Reference your local docker-compose.yml
 
       - name: Wait for Services to be Ready
         run: sleep 20  # Ensure services are up and ready (adjust timing as needed)
 
       - name: Run Integration Tests
         run: |
-          go test -v ./...   # Run your integration tests against the running containers
+          chmod +x ./integration_test.sh
+          ./integration_test.sh  # Execute the shell script for API testing
 
       - name: Stop Docker Compose
-        run: docker-compose down
+        run: docker-compose -f docker/docker-compose.yml down
