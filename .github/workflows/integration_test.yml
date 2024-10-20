@@ -41,4 +41,4 @@ jobs:
           ./integration_test.sh  
 
       - name: Stop Docker Compose
-        run: docker-compose -f docker/docker_compose.yml down
+        run: docker-compose -f docker-compose.yml down
