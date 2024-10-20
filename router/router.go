@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/gorilla/mux"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/srikanthbhandary/todo-server/service"
 	"github.com/srikanthbhandary/todo-server/worker"
 )
@@ -42,6 +43,9 @@ func NewRouter(todoSvc service.ToDoService,
 
 func (s *Router) InitRoutes() {
 	s.Router.HandleFunc("/", s.ServeHTML).Methods("GET")
+
+	//prometheus endpoint
+	s.Router.Handle("/metrics", promhttp.Handler())
 
 	// User endpoints
 	s.Router.HandleFunc("/users", s.CreateUser).Methods("POST")
