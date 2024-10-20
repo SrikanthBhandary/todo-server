@@ -1,0 +1,10 @@
+port: ":8080"             
+dsn: "host=localhost port=5432 user=srikanth password=password dbname=postgres sslmode=disable"  # Database connection string
+jwt_secret_key: "your_jwt_secret_key" 
+redis_address: "localhost:6379" 
+html_assets_path: "/Users/srikanth/Desktop/todo-server/static/html/"  
+num_of_workers: 5
+smtp_host: "smtp.example.com" 
+smtp_port: 587            
+smtp_user_name: "user@example.com" 
+smtp_password: "your_smtp_password"

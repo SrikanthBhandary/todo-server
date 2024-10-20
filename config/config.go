@@ -9,6 +9,21 @@ import (
 
 // Config holds the configuration settings for the application.
 type Config struct {
+	// Port is the server port
+	Port string `yaml:"port"`
+
+	// DSN specifies the database address
+	DSN string `yaml:"dsn"`
+
+	//JwtSecretKey specifies the JwtSecretKey
+	JwtSecretKey string `yaml:"jwt_secret_key"`
+
+	// RedisAddress specifies the redis address
+	RedisAddress string `yaml:"redis_address"`
+
+	// HtmlAssetsPath to store the html files
+	HtmlAssetsPath string `yaml:"html_assets_path"`
+
 	// NumOfWorkers specifies the number of worker threads to be used.
 	// It determines how many concurrent tasks can be processed.
 	NumOfWorkers int `yaml:"num_of_workers"`
@@ -33,6 +48,7 @@ type Config struct {
 // GetDefaultConfig returns a Config instance with default values.
 func GetDefaultConfig() *Config {
 	return &Config{
+
 		NumOfWorkers: 3,
 		SmtpHost:     "localhost",
 		SmtpPort:     587,
