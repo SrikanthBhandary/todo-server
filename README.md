@@ -21,6 +21,32 @@ smtp_user_name: "your_email@example.com"  # SMTP username
 smtp_password: "your_email_password"  # SMTP password
 ```
 
+
+## Migrate Commands - To initate the DB with the tables
+
+
+### Executing Migrations
+
+To execute the migrations, you need to set the `POSTGRESQL_URL` environment variable to point to your PostgreSQL database. Use the following command:
+
+```bash
+export POSTGRESQL_URL='postgres://postgres:password@localhost:5432/postgres?sslmode=disable'
+```
+
+Replace `postgres:password@localhost:5432/postgres` with your actual database credentials and connection details.
+
+Then, run the following command to apply the migrations:
+
+```bash
+migrate -database ${POSTGRESQL_URL} -path db/migrations up
+```
+
+- `-database ${POSTGRESQL_URL}`: Specifies the database connection string.
+- `-path db/migrations`: Indicates the directory containing the migration files.
+- `up`: Applies the migrations to the database.
+
+---
+
 ## Learning Path
 
 Throughout the development of this application, I have focused on several key topics in Go:
