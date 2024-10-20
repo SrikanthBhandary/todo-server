@@ -7,12 +7,19 @@ response=$(curl -s -X POST http://localhost:8080/users \
     -H "Content-Type: application/json" \
     -d '{"user_name": "testuser16", "password": "mypassword15", "email": "testuser16@example.com"}')
 
-user_id=$(echo $response | jq -r '.id')
-echo "User created with ID: $user_id"
+
+expected_message="User created successfully"
+if [[ $(echo "$response" | jq -r '.message') == "$expected_message" ]]; then
+    echo "User creation assertion passed: $expected_message"
+else
+    echo "User creation assertion failed: Expected '$expected_message', got '$response'"
+    exit 1
+fi
+
 
 # Get user details
 echo "Getting user details..."
-curl -s -X GET http://localhost:8080/users/$user_id
+curl -s -X GET http://localhost:8080/users/1
 
 # Login the user and extract the token
 echo "Logging in the user..."

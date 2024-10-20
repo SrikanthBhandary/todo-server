@@ -33,14 +33,11 @@ jobs:
 
       - name: Set up Docker Compose
         run: |
-          docker-compose -f docker_compose.yml up -d 
-
-      - name: Wait for Services to be Ready
-        run: sleep 50 
+          docker-compose -f docker-compose.yml up -d 
 
       - name: Run Integration Tests
         run: |
-          chmod +x integration_test.sh
+          chmod +x ./integration_test.sh
           ./integration_test.sh  
 
       - name: Stop Docker Compose

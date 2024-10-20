@@ -8,28 +8,35 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: postgres
     ports:
-      - "5432:5432"
+      - "5432:5432"    
+    
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U srikanth"]
+      test: ["CMD-SHELL", "pg_isready -U srikanth -d postgres"]
       interval: 10s
-      timeout: 5s
+      timeout: 10s
       retries: 5
 
   redis:
     image: redis:7
     ports:
-      - "6379:6379"
+      - "6379:6379"    
+
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       retries: 5
 
   app:
+    volumes:
+    - ./conf_testing.yaml:/config.yaml
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile    
+    ports:
+      - "8080:8080"   
     depends_on:
       postgres:
         condition: service_healthy
       redis:
-        condition: service_healthy    
+        condition: service_healthy 
+    command: ["sh", "-c", "migrate -database 'postgres://srikanth:password@postgres:5432/postgres?sslmode=disable' -path /app/db/migrations up && ./todo-server"]
