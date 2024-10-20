@@ -1,7 +1,12 @@
 # ToDo Application in Go 
 [![Go](https://github.com/SrikanthBhandary/todo-server/actions/workflows/go.yml/badge.svg?branch=main)](https://github.com/SrikanthBhandary/todo-server/actions/workflows/go.yml) [![Integration Test](https://github.com/SrikanthBhandary/todo-server/actions/workflows/integration_test.yml/badge.svg)](https://github.com/SrikanthBhandary/todo-server/actions/workflows/integration_test.yml)
 
+
 This ToDo application demonstrates my learning journey with Golang and this will help the entry level developers to understand the golang components, showcasing various concepts and features of the language. 
+
+## How to run?
+
+If you want to see how the application looks and you have Docker installed, simply run the `docker-compose up` command. Then, open your browser and navigate to http://localhost:8080 to access the application.
 
 ## Configuration
 The application uses a configuration file to manage various settings, including database connection details, server ports, and Redis configurations.
