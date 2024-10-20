@@ -1,4 +1,6 @@
-# ToDo Application in Go [![Go](https://github.com/SrikanthBhandary/todo-server/actions/workflows/go.yml/badge.svg?branch=main)](https://github.com/SrikanthBhandary/todo-server/actions/workflows/go.yml)
+# ToDo Application in Go 
+[![Go](https://github.com/SrikanthBhandary/todo-server/actions/workflows/go.yml/badge.svg?branch=main)](https://github.com/SrikanthBhandary/todo-server/actions/workflows/go.yml) [![Integration Test](https://github.com/SrikanthBhandary/todo-server/actions/workflows/integration_test.yml/badge.svg)](https://github.com/SrikanthBhandary/todo-server/actions/workflows/integration_test.yml)
+
 This ToDo application demonstrates my learning journey with Golang and this will help the entry level developers to understand the golang components, showcasing various concepts and features of the language. 
 
 ## Configuration
