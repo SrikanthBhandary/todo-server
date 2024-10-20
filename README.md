@@ -13,15 +13,13 @@ port: "9999"  # Server port
 dsn: "host=localhost port=5432 user=srikanth password=password dbname=postgres sslmode=disable"  # Database connection string  
 jwt_secret_key: "your_jwt_secret"  # JWT secret key
 redis_address: "localhost:6379"  # Redis server address
-html_assets_path: "todo-server/static/html"  # Path to HTML files
+html_assets_path: "./todo-server/static/html"  # Path to HTML files . Give the absolute path to the html templates
 num_of_workers: 5  # Number of worker threads
 smtp_host: "smtp.example.com"  # SMTP server address
 smtp_port: 587  # SMTP server port
 smtp_user_name: "your_email@example.com"  # SMTP username
 smtp_password: "your_email_password"  # SMTP password
 ```
-
-
 
 ## Learning Path
 
@@ -66,8 +64,9 @@ To run the application, follow these steps:
 1. Clone the repository.
 2. Run `go mod tidy` to install dependencies.
 3. Go to the fodler cmd/server
-4. Execute the application with `go run .`.
-5. Access the API at `http://localhost:9999`.
+4. Execute the application with `go run .`. or just use go run cmd/server/main.go from root directory of the cloned repo.
+
+5. Access the API at `http://localhost:8080`.
 
 ## Future Improvements
 - Handle validation
