@@ -1,6 +1,28 @@
 # ToDo Application in Go [![Go](https://github.com/SrikanthBhandary/todo-server/actions/workflows/go.yml/badge.svg?branch=main)](https://github.com/SrikanthBhandary/todo-server/actions/workflows/go.yml)
 This ToDo application demonstrates my learning journey with Golang and this will help the entry level developers to understand the golang components, showcasing various concepts and features of the language. 
 
+## Configuration
+The application uses a configuration file to manage various settings, including database connection details, server ports, and Redis configurations.
+
+Config File Structure
+Create a config.yaml file in the root directory of your project with the following structure:
+
+
+``` YAML
+port: "9999"  # Server port
+dsn: "host=localhost port=5432 user=srikanth password=password dbname=postgres sslmode=disable"  # Database connection string  
+jwt_secret_key: "your_jwt_secret"  # JWT secret key
+redis_address: "localhost:6379"  # Redis server address
+html_assets_path: "todo-server/static/html"  # Path to HTML files
+num_of_workers: 5  # Number of worker threads
+smtp_host: "smtp.example.com"  # SMTP server address
+smtp_port: 587  # SMTP server port
+smtp_user_name: "your_email@example.com"  # SMTP username
+smtp_password: "your_email_password"  # SMTP password
+```
+
+
+
 ## Learning Path
 
 Throughout the development of this application, I have focused on several key topics in Go:
