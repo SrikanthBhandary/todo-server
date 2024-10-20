@@ -1,0 +1,62 @@
+name: Integration Test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  integration-test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_USER: srikanth
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: postgres
+        options: >-
+          --health-cmd "pg_isready -U srikanth" 
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: --health-cmd "redis-cli ping" --health-interval 10s --health-retries 5
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.22  # Use the required Go version
+
+      - name: Install Dependencies
+        run: |
+          go mod tidy
+          go mod download
+
+      - name: Set up Docker Compose
+        run: |
+          docker-compose up -d  # Start the app along with postgres and redis containers
+
+      - name: Wait for Services to be Ready
+        run: sleep 20  # Ensure services are up and ready (adjust timing as needed)
+
+      - name: Run Integration Tests
+        run: |
+          go test -v ./...   # Run your integration tests against the running containers
+
+      - name: Stop Docker Compose
+        run: docker-compose down
