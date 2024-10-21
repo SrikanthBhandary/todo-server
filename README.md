@@ -90,6 +90,10 @@ Throughout the development of this application, I have focused on several key to
 ### 10. **Context Management**
    - Using the `context` package for managing cancellation and timeouts across goroutines.
 
+### 11. **Support to websocket **
+
+### 12. **PDF download using worker pool**
+
 ## Getting Started
 
 To run the application, follow these steps:

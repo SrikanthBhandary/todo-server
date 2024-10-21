@@ -43,6 +43,8 @@ type Config struct {
 	// SmtpPassword is the password associated with the SmtpUserName.
 	// It is used for authenticating to the SMTP server and should be kept secure.
 	SmtpPassword string `yaml:"smtp_password"`
+
+	PDFOutputPath string `yaml:"pdf_output_path"`
 }
 
 // GetDefaultConfig returns a Config instance with default values.

@@ -4,12 +4,15 @@ import (
 	"context"
 	"log"
 	"sync"
+
+	"github.com/srikanthbhandary/todo-server/entity"
 )
 
 type WorkerPool struct {
 	numOfWorkers int            // The number of workers (goroutines) that will be processing jobs.
 	wg           sync.WaitGroup // WaitGroup to keep track of active workers and ensure they complete their tasks before shutdown.
 	inputChannel chan Job       // The channel through which jobs are submitted for processing. Workers will consume jobs from this channel.
+	WebSocket    *entity.WebSocketConnection
 }
 
 // NewWorkerPool creates a new WorkerPool
@@ -34,9 +37,11 @@ func (wp *WorkerPool) StartWorker(ctx context.Context) {
 			if !ok {
 				return
 			}
+			log.Println("JOB Received")
 			if err := job.Process(); err != nil {
 				log.Printf("error processing job: %v", err)
 			}
+
 		}
 	}
 }

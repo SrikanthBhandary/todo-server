@@ -151,6 +151,8 @@
 
       <!-- Home Container -->
       <div id="home-container" class="hidden">
+        <div id="flash-message"></div>
+
         <h1>ToDo Application</h1>
 
         <!-- Create Todo Section -->
@@ -164,6 +166,9 @@
         <div class="todo-list" id="todo-list"></div>
 
         <!-- Logout Button -->
+        <button id="download-button" onclick="downloadFile()">Download File</button>
+
+
         <button onclick="logout()">Logout</button>
       </div>
     </div>
@@ -385,6 +390,71 @@
         document.cookie = "authToken=; max-age=0; path=/"; // Clear the token from cookies
         showAuthContainer(); // Show the authentication form again
       }
+
+      const socket = new WebSocket("ws://localhost:8080/ws");
+
+      socket.onmessage = function (event) {
+        const message = event.data;
+        document.getElementById('flash-message').textContent = message;
+        document.getElementById('flash-message').style.display = 'block';
+
+        
+        const filePathMatch = message.match(/Download from: (.+)/);
+        if (filePathMatch && filePathMatch[1]) {
+          const filePath = filePathMatch[1].trim();
+              // Trigger download
+          downloadPDF(filePath);
+        }
+
+      };
+
+    async function downloadPDF(filePath) { 
+      const token = getToken(); // Get the token from cookies
+      const response = await fetch("/todos"+ filePath, {
+          method: 'GET',
+          headers: {
+              'Authorization': `Bearer ${token}`, // Include the token in the request
+          },
+      });
+
+      if (response.ok) {
+          const blob = await response.blob(); // Read the response as a Blob
+          const url = window.URL.createObjectURL(blob); // Create a URL for the Blob
+
+          // Create a link element to trigger the download
+          const link = document.createElement('a');
+          link.href = url;
+          link.setAttribute('download', 'output.pdf'); // Specify the filename for the download
+          document.body.appendChild(link);
+          link.click(); // Simulate a click to trigger the download
+          link.parentNode.removeChild(link); // Clean up by removing the link
+      } 
+    }
+
+      async function downloadFile() {
+        const token = getToken(); // Get the token from cookies
+
+        if (!token) {
+            alert("You need to log in first.");
+            return;
+        }
+
+        
+        // Set the authorization header
+        const response = await fetch("/todos/download", {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+        });
+
+        if (response.ok) {
+           alert(await response.text())
+        } else {
+            alert("Error downloading file.");
+        }
+    }
+  
     </script>
   </body>
 </html>

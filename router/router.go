@@ -2,6 +2,7 @@ package router
 
 import (
 	"context"
+	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -9,7 +10,9 @@ import (
 	"strings"
 
 	"github.com/gorilla/mux"
+	"github.com/gorilla/websocket"
 	"github.com/srikanthbhandary/todo-server/config"
+	"github.com/srikanthbhandary/todo-server/entity"
 	"github.com/srikanthbhandary/todo-server/service"
 	"github.com/srikanthbhandary/todo-server/worker"
 )
@@ -56,6 +59,7 @@ func NewRouter(todoSvc service.ToDoService, userSvc service.UserService,
 }
 
 func (rt *Router) InitRoutes() {
+	rt.Router.HandleFunc("/ws", rt.WebSocketHandler).Methods("GET")
 	rt.Router.HandleFunc("/", rt.ServeHTML).Methods("GET")
 
 	// User endpoints
@@ -70,6 +74,9 @@ func (rt *Router) InitRoutes() {
 	protectedRouter.Use(rt.JRateLimiterMiddleware) // Apply JWT middleware to this subrouter
 
 	// ToDo endpoints (protected)
+	protectedRouter.HandleFunc("/download", rt.DownloadToDos).Methods("GET")
+	protectedRouter.HandleFunc("/download/output/{filename}", rt.DownloadFileHandler).Methods("GET")
+
 	protectedRouter.HandleFunc("", rt.GetAllToDos).Methods("GET")            // /todos
 	protectedRouter.HandleFunc("", rt.CreateToDo).Methods("POST")            // /todos for creating a todo
 	protectedRouter.HandleFunc("/{todoID}", rt.GetTodo).Methods("GET")       // /todos/{todoID}
@@ -134,4 +141,37 @@ func (rt *Router) ServeHTML(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "text/html")
 	w.Write(file)
+}
+
+/*
+==== implemeting the websocket logic
+*/
+
+var upgrader = websocket.Upgrader{
+	CheckOrigin: func(r *http.Request) bool {
+		return true // Allow all connections for now (can be adjusted for security)
+	},
+}
+
+func (rt *Router) WebSocketHandler(w http.ResponseWriter, r *http.Request) {
+	conn, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		http.Error(w, "Unable to upgrade to websocket", http.StatusInternalServerError)
+		return
+	}
+
+	webSocket := &entity.WebSocketConnection{Conn: conn}
+	// Store the WebSocket connection for further use (e.g., in WorkerPool jobs)
+	rt.WorkerPool.WebSocket = webSocket
+}
+
+func (rt *Router) DownloadFileHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println("Downloading")
+	vars := mux.Vars(r)
+	filename := vars["filename"]
+
+	// Set the path to the directory where your PDF files are stored
+	filepath := filepath.Join(rt.Config.PDFOutputPath, filename)
+
+	http.ServeFile(w, r, filepath)
 }

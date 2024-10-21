@@ -7,9 +7,11 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/srikanthbhandary/todo-server/entity"
+	"github.com/srikanthbhandary/todo-server/utility"
+	"github.com/srikanthbhandary/todo-server/worker"
 )
 
-func (s *Router) CreateToDo(w http.ResponseWriter, r *http.Request) {
+func (rt *Router) CreateToDo(w http.ResponseWriter, r *http.Request) {
 	var todo entity.ToDo // Make sure you have a ToDo struct in your service/entity package
 	err := json.NewDecoder(r.Body).Decode(&todo)
 	w.Header().Set("Content-Type", "application/json")
@@ -24,7 +26,7 @@ func (s *Router) CreateToDo(w http.ResponseWriter, r *http.Request) {
 	userID := r.Context().Value("userID").(int)
 	todo.UserID = userID // Associate the todo with the logged-in user
 
-	err = s.todoService.AddToDo(r.Context(), &todo)
+	err = rt.todoService.AddToDo(r.Context(), &todo)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(map[string]string{"error": "failed to create todo", "message": err.Error()})
@@ -35,11 +37,11 @@ func (s *Router) CreateToDo(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]string{"message": "ToDo created successfully"})
 }
 
-func (s *Router) GetAllToDos(w http.ResponseWriter, r *http.Request) {
+func (rt *Router) GetAllToDos(w http.ResponseWriter, r *http.Request) {
 	// Extract user ID from the context
 	userID := r.Context().Value("userID").(int)
 
-	todos, err := s.todoService.GetAllTodos(r.Context(), userID)
+	todos, err := rt.todoService.GetAllTodos(r.Context(), userID)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(map[string]string{"error": "failed to retrieve todos", "message": err.Error()})
@@ -50,7 +52,7 @@ func (s *Router) GetAllToDos(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(todos)
 }
 
-func (s *Router) GetTodo(w http.ResponseWriter, r *http.Request) {
+func (rt *Router) GetTodo(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	todoID, err := strconv.Atoi(vars["todoID"])
 	if err != nil {
@@ -62,7 +64,7 @@ func (s *Router) GetTodo(w http.ResponseWriter, r *http.Request) {
 	// Extract user ID from the context
 	userID := r.Context().Value("userID").(int)
 
-	todo, err := s.todoService.GetTodo(r.Context(), userID, todoID)
+	todo, err := rt.todoService.GetTodo(r.Context(), userID, todoID)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		json.NewEncoder(w).Encode(map[string]string{"error": "todo not found"})
@@ -73,7 +75,7 @@ func (s *Router) GetTodo(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(todo)
 }
 
-func (s *Router) DeleteToDo(w http.ResponseWriter, r *http.Request) {
+func (rt *Router) DeleteToDo(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	todoID, err := strconv.Atoi(vars["todoID"])
 	if err != nil {
@@ -85,7 +87,7 @@ func (s *Router) DeleteToDo(w http.ResponseWriter, r *http.Request) {
 	// Extract user ID from the context
 	userID := r.Context().Value("userID").(int)
 
-	err = s.todoService.DeleteToDo(r.Context(), userID, todoID)
+	err = rt.todoService.DeleteToDo(r.Context(), userID, todoID)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		json.NewEncoder(w).Encode(map[string]string{"error": "failed to delete todo", "message": err.Error()})
@@ -95,11 +97,11 @@ func (s *Router) DeleteToDo(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
-func (s *Router) DeleteAllTodos(w http.ResponseWriter, r *http.Request) {
+func (rt *Router) DeleteAllTodos(w http.ResponseWriter, r *http.Request) {
 	// Extract user ID from the context
 	userID := r.Context().Value("userID").(int)
 
-	err := s.todoService.DeleteAllTodos(r.Context(), userID)
+	err := rt.todoService.DeleteAllTodos(r.Context(), userID)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(map[string]string{"error": "failed to delete todos", "message": err.Error()})
@@ -107,4 +109,33 @@ func (s *Router) DeleteAllTodos(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusNoContent)
+}
+
+func (rt *Router) DownloadToDos(w http.ResponseWriter, r *http.Request) {
+	userID := r.Context().Value("userID").(int)
+	user, err := rt.userService.GetUserByID(r.Context(), userID)
+	if err != nil {
+		http.Error(w, "User not found", http.StatusNotFound)
+		return
+	}
+
+	todos, err := rt.todoService.GetAllTodos(r.Context(), userID)
+	if err != nil {
+		http.Error(w, "Error fetching todos", http.StatusInternalServerError)
+		return
+	}
+
+	// Enqueue the PDF generation job
+	pdfJob := &worker.PDFJob{
+		UserID:    userID,
+		UserName:  user.UserName,
+		Email:     user.Email,
+		Todos:     todos,
+		Generator: utility.NewPDFGenerator(rt.Config.PDFOutputPath),
+		WebSocket: rt.WorkerPool.WebSocket, // Use the active WebSocket connection
+	}
+	rt.WorkerPool.EnqueueJob(pdfJob)
+
+	// Inform the client the job is queued
+	w.Write([]byte("PDF generation started. You'll be notified when it's ready for download."))
 }

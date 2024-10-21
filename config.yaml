@@ -8,3 +8,4 @@ smtp_host: "smtp.example.com"
 smtp_port: 587            
 smtp_user_name: "user@example.com" 
 smtp_password: "your_smtp_password"
+pdf_output_path: "output"
